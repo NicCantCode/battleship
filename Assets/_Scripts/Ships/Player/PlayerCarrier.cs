@@ -1,12 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class PlayerCarrier : Ship
 {
+    private readonly Vector3 _direction = new Vector3(0,0,1);
+
+
+    private void FixedUpdate()
+    {
+        PrintCellNamesOnOverlap();
+    }
+
     protected override void SinkShip()
     {
-        Debug.Log("Player Carrier was sunk!");
+        Debug.Log("Player Battleship was sunk!");
     }
 }
