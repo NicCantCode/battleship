@@ -2,22 +2,22 @@
 
 public class Draggable : MonoBehaviour
 {
-    private Vector3 _positionOffset;
     private Camera _mainCamera;
+    private bool _isDraggable;
     
     private void Awake()
     {
         _mainCamera = Camera.main;
+        ToggleDrag();
     }
-    
-    private void OnMouseDown()
-    {
-        _positionOffset = transform.position - GetMousePosition();
-    }
-    
+
     private void OnMouseDrag()
     {
-        transform.position = GetMousePosition() + _positionOffset;
+        if (!_isDraggable) return;
+        
+        transform.position = GetMousePosition();
+        
+        if (Input.GetKeyDown(KeyCode.R)) Rotate();
     }
 
     private Vector3 GetMousePosition()
@@ -25,5 +25,15 @@ public class Draggable : MonoBehaviour
         var mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0;
         return mousePosition;
+    }
+
+    private void Rotate()
+    {
+        transform.Rotate(0, 0, 90, Space.World);
+    }
+
+    public void ToggleDrag()
+    {
+        _isDraggable = !_isDraggable;
     }
 }
