@@ -5,9 +5,8 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
-    
     private const float CellSize = 0.5f;
-    [SerializeField] private List<Cell> _boardGrid = new List<Cell>();
+    private List<Cell> _boardGrid = new List<Cell>();
     
     public GameObject cellPrefab;
 
@@ -21,16 +20,33 @@ public class BoardManager : MonoBehaviour
 
     private void BuildBoard(int width, int height)
     {
+        var thisTransform = transform;
+        
         for (var i = 0; i < width; i++)
         {
             for (var j = 0; j < height; j++)
             {
-                var cell = Instantiate(cellPrefab, new Vector3(i * CellSize, j * CellSize, 0) + transform.position, Quaternion.identity, transform);
+                var cell = Instantiate(cellPrefab, new Vector3(i * CellSize, j * CellSize, 0) + thisTransform.position, Quaternion.identity, thisTransform);
                 cell.name = "Cell " + "(" + i +"," + j +")";
                 var cellComponent = cell.GetComponent<Cell>();
                 cellComponent.SetGridLocation(new Vector2(i, j));
                 _boardGrid.Add(cellComponent);
             }
         }
+    }
+
+    public Cell GetCellByGridIndex(Vector2 gridIndex)
+    {
+        return _boardGrid.Find(c => c.GetGridLocation() == gridIndex);
+    }
+
+    public void SetCellShipState(Vector2 cellIndex, bool hasShip)
+    {
+        GetCellByGridIndex(cellIndex).SetShipState(hasShip);
+    }
+
+    public bool GetCellShipState(Vector2 cellIndex)
+    {
+        return GetCellByGridIndex(cellIndex).GetShipState();
     }
 }
