@@ -11,7 +11,7 @@ public class Cell : MonoBehaviour
     private bool _hasMarker;
     private bool _hasShip;
 
-    [SerializeField] private Vector2 gridLocation;
+    [SerializeField] private Vector2 _gridLocation;
 
     private void Awake()
     {
@@ -48,21 +48,28 @@ public class Cell : MonoBehaviour
 
     public Vector2 GetGridLocation()
     {
-        return gridLocation;
+        return _gridLocation;
     }
 
     public void SetGridLocation(Vector2 gridLocation)
     {
-        this.gridLocation = gridLocation;
+        _gridLocation = gridLocation;
     }
 
-    public bool ContainsShip()
+    public bool GetShipState()
     {
         return _hasShip;
     }
 
+    public void SetShipState(bool hasShip)
+    {
+        _hasShip = hasShip;
+    }
+
     private void OnMouseDown()
     {
+        if (!_gameManager.GetPlaceMarkerState()) return;
+        
         switch (_hasMarker)
         {
             case false:
