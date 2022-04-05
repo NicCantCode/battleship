@@ -23,7 +23,7 @@ public class Draggable : MonoBehaviour
     private Vector3 GetMousePosition()
     {
         var mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0;
+        mousePosition.z = -0.5f;
         return mousePosition;
     }
 
