@@ -13,20 +13,18 @@ public class BoardManager : MonoBehaviour
     // Debug
     public Vector2 gridSize = new Vector2(5, 5);
     
-    private void Start()
+    private void Awake()
     {
-        BuildBoard((int) gridSize.x, (int) gridSize.y);
+        BuildBoard((int) gridSize.x, (int) gridSize.y, transform);
     }
 
-    private void BuildBoard(int width, int height)
+    private void BuildBoard(int width, int height, Transform parent)
     {
-        var thisTransform = transform;
-        
         for (var i = 0; i < width; i++)
         {
             for (var j = 0; j < height; j++)
             {
-                var cell = Instantiate(cellPrefab, new Vector3(i * CellSize, j * CellSize, 0) + thisTransform.position, Quaternion.identity, thisTransform);
+                var cell = Instantiate(cellPrefab, new Vector3(i * CellSize, j * CellSize, 0) + transform.position, Quaternion.identity, parent);
                 cell.name = "Cell " + "(" + i +"," + j +")";
                 var cellComponent = cell.GetComponent<Cell>();
                 cellComponent.SetGridLocation(new Vector2(i, j));

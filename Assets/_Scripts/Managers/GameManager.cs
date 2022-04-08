@@ -1,13 +1,22 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     private MarkerType _markerType;
     private bool _canPlaceMarkers;
+    private List<Cell> _shipBearingCells;
 
-    public void SetMarkerType(string markerType)
+    private void Awake()
     {
-        _markerType = markerType.Equals("HIT") ? MarkerType.HIT : MarkerType.MISS; // Clean this up later
+        _shipBearingCells = new List<Cell>();
+        _canPlaceMarkers = false;
+    }
+
+    public void SetMarkerType(MarkerType markerType)
+    {
+        _markerType = markerType;
     }
 
     public MarkerType GetMarkerType()
@@ -23,5 +32,10 @@ public class GameManager : MonoBehaviour
     public bool GetPlaceMarkerState()
     {
         return _canPlaceMarkers;
+    }
+
+    public void AddShipBearingCell(Cell cell)
+    {
+        _shipBearingCells.Add(cell);
     }
 }
