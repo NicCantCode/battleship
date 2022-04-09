@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class DragAndSnap : MonoBehaviour
 {
     private Camera _mainCamera;
-    [SerializeField] private bool _isDraggable;
     private bool _isValidShipPosition;
 
     private Ship _thisShip;
@@ -19,13 +19,15 @@ public class DragAndSnap : MonoBehaviour
         _mainCamera = Camera.main;
         _thisShip = GetComponent<Ship>();
         _originalShipPosition = transform.position;
-        _isDraggable = true;
+        _gameManager.SetDragEnabled(true);
     }
 
     private void OnMouseDrag()
     {
-        if (!_isDraggable) return;
-
+        if (!_gameManager.GetDragEnabled()) return;
+        
+        ResetCells();
+        
         _isValidShipPosition = _thisShip.IsValidShipPosition(_thisShip.OccupiedCells);
 
         transform.position = GetMousePosition();
@@ -35,6 +37,8 @@ public class DragAndSnap : MonoBehaviour
 
     private void OnMouseUp()
     {
+        if (!_gameManager.GetDragEnabled()) return;
+        
         if (_isValidShipPosition)
         {
             ResetShipTransform(false);
@@ -64,11 +68,21 @@ public class DragAndSnap : MonoBehaviour
         
     }
 
+    private void ResetCells()
+    {
+        foreach (var cell in _thisShip.OccupiedCells.ToList())
+        {
+            if (cell.GetShipType() != _thisShip.ShipType) continue;
+            cell.SetShipState(false, ShipType.NONE, null);
+            _gameManager.RemoveShipBearingCell(cell);
+        }
+    }
+
     private void MarkCellsOccupied(List<Cell> occupiedCells)
     {
         foreach (var cell in occupiedCells)
         {
-            cell.SetShipState(true);
+            cell.SetShipState(true, _thisShip.ShipType, _thisShip);
             _gameManager.AddShipBearingCell(cell);
         }
     }
@@ -89,10 +103,5 @@ public class DragAndSnap : MonoBehaviour
     private void Rotate()
     {
         transform.Rotate(0, 0, 90, Space.World);
-    }
-
-    public void ToggleDrag()
-    {
-        _isDraggable = !_isDraggable;
     }
 }
