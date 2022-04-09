@@ -9,6 +9,7 @@ public abstract class Ship : MonoBehaviour
     
     private int _hitCounter;
     private bool _isAboveCells;
+    private GameManager _gameManager;
     
     public bool IsShipHit { get; set; }
     
@@ -29,10 +30,16 @@ public abstract class Ship : MonoBehaviour
 
     protected abstract void SinkShip();
 
-    private void Start()
+    private void Awake()
     {
+        _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _occupiedCells = new Queue<Cell>(shipSize);
         _isPlaced = false;
+    }
+
+    public GameManager GetGameManagerReference()
+    {
+        return _gameManager;
     }
 
     public void SetIsPlaced(bool isPlaced)
@@ -40,7 +47,7 @@ public abstract class Ship : MonoBehaviour
         _isPlaced = isPlaced;
     }
 
-    private void SendRaycasts(float thisRotation, Transform thisTransform, Vector3 thisPosition)
+    private void SendRaycasts(float thisRotation, Vector3 thisPosition)
     {
         var origin = new Vector3();
         var offset = (ShipSize - 1) * 0.25f;
@@ -60,7 +67,7 @@ public abstract class Ship : MonoBehaviour
         for (var i = 0; i < ShipSize; i++)
         {
             var hit = Physics2D.Raycast(origin, _direction, 1);
-
+            
             if (hit.collider != null)
             {
                 _isAboveCells = true;
@@ -92,6 +99,7 @@ public abstract class Ship : MonoBehaviour
         if (_hitCounter + 1 > shipSize) return;
 
         _hitCounter++;
+        print($"Ship Hit! {_hitCounter}/{shipSize} Hits.");
 
         // If the number of hits equals the total size of the ship, it will sink.
         if (_hitCounter >= shipSize)
@@ -104,9 +112,38 @@ public abstract class Ship : MonoBehaviour
     {
         var thisTransform = transform;
         var thisPosition = thisTransform.position;
+        var isCellOccupied = false;
+
+        foreach (var potentialCell in occupiedCellsToCheck.ToList())
+        {
+            foreach (var occupiedCell in _gameManager.GetShipBearingCells())
+            {
+                if (potentialCell == occupiedCell) isCellOccupied = true;
+            }
+        }
+
+        SendRaycasts(thisTransform.rotation.eulerAngles.z, thisPosition);
         
-        SendRaycasts(thisTransform.rotation.eulerAngles.z, thisTransform, thisPosition);
-        
-        return _isAboveCells && occupiedCellsToCheck.Count == occupiedCellsToCheck.Distinct().Count() && occupiedCellsToCheck.Count != 0;
+        return !isCellOccupied && _isAboveCells && occupiedCellsToCheck.Count == occupiedCellsToCheck.Distinct().Count() && occupiedCellsToCheck.Count != 0;
+    }
+
+    public void SetOccupiedCells(Queue<Cell> occupiedCells)
+    {
+        _occupiedCells = occupiedCells;
+    }
+
+    public void SetShipType(ShipType newShipType)
+    {
+        shipType = newShipType;
+    }
+
+    public void SetShipSize(int newShipSize)
+    {
+        shipSize = newShipSize;
+    }
+
+    public void SetShipOwner(ShipOwner newShipOwner)
+    {
+        shipOwner = newShipOwner;
     }
 }
