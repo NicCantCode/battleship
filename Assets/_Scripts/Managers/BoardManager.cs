@@ -17,6 +17,12 @@ public class BoardManager : MonoBehaviour
     private List<Cell> _playerBoardGrid = new List<Cell>();
     private List<Cell> _enemyBoardGrid = new List<Cell>();
 
+    private Stack<Cell> _playerBoardStack;
+
+    private Cell _previouslyGuessedCell;
+    private bool _foundShip;
+    private bool _keepDirection;
+    private Vector2 _directionForAICheck;
 
     private List<Cell> _enemyOccupiedCells = new List<Cell>();
     [SerializeField] private List<Ship> _enemyShips = new List<Ship>();
@@ -38,6 +44,7 @@ public class BoardManager : MonoBehaviour
     public void BuildPlayerBoard()
     {
         BuildBoard(BoardWidth, BoardHeight, playerBoardParent, true);
+        _playerBoardStack = ToStack(Shuffle(new List<Cell>(_playerBoardGrid)));
     }
 
     public void BuildTargetingBoard()
@@ -59,34 +66,148 @@ public class BoardManager : MonoBehaviour
     IEnumerator EnemyTurnStartCoroutine()
     {
         _gameManager.SetCanPlaceMarkers(false);
-        _gameManager.SetEnemyTurn();
         print("Enemy's turn!");
         
-        yield return new WaitForSecondsRealtime(Random.Range(0, 5));
-        //yield return new WaitForSecondsRealtime(0); // Debug
-
-        var randomVector = new Vector2(Random.Range(0, BoardHeight), Random.Range(0, BoardWidth));
+        yield return new WaitForSecondsRealtime(0); // Debug
         
-        while (GetCellByGridIndex(_playerBoardGrid, randomVector).GetHasMarker())
+        AISimple(out var guessedCell, out var result); // DO AI
+        
+        if (result == MarkerType.HIT) guessedCell.GetOccupyingShip().MarkShipAsHit();
+        
+        print($"Enemy {result} at ({guessedCell.GetGridLocation().x}, {guessedCell.GetGridLocation().y})!");
+        _gameManager.SetCanPlaceMarkers(true);
+        print("Player's turn!");
+    }
+    
+    // This AI chooses a random cell each turn using a randomized stack of the board cells
+    private void AISimple(out Cell guessedCell, out MarkerType result)
+    {
+        guessedCell = _playerBoardStack.Pop();
+        result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
+        guessedCell.SetMarker(result);
+    }
+
+    // TODO: Come back to AIIntermediate later with a fresh mind.
+    // This AI chooses a random cell each turn until a ship is hit, than chooses cells in the vicinity of the hit ship
+    private void AIIntermediate(out Cell guessedCell, out MarkerType result)
+    {
+        // Get guessed cell from shuffled stack
+        // If Cell has no ship, simply return MISS result
+        // If Cell has a ship, set foundShip to true and previouslyGuessedCell to guessedCell
+        // Use previouslyGuessedCell and helper function to look at cells around this cell for hits
+        // When a hit is found, continue in the direction of that hit until a miss is found
+        // When miss is found go in opposite direction until another miss is found
+        // Set foundShip to false
+        // Repeat
+        
+        
+        if (!_foundShip)
         {
-            randomVector = new Vector2(Random.Range(0, BoardHeight), Random.Range(0, BoardWidth));
+            guessedCell = _playerBoardStack.Pop();
+            result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
+
+            if (result == MarkerType.MISS)
+            {
+                result = MarkerType.MISS;
+                _foundShip = false;
+            }
+
+            if (result == MarkerType.HIT)
+            {
+                _foundShip = true;
+                _previouslyGuessedCell = guessedCell;
+                
+            }
+        }
+        else
+        {
+            // Get cell neighboring previouslyGuessedCell
+            // Check it, mark it
+            // If miss, try new direction next turn
+            // If hit, continue in that direction every turn until a miss is found
+            // Reverse direction and continue until a miss is found
+            // Set foundShip to false
+
+
+            if (!_keepDirection) _directionForAICheck = GetRandomDirectionVector();
+            
+            var neighbor = GetCellNeighbor(_previouslyGuessedCell, _directionForAICheck);
+
+            var counter = 0;
+            
+            while (neighbor == null || neighbor.GetHasMarker() || counter < 4)
+            {
+                MoveClockwise();
+                neighbor = GetCellNeighbor(_previouslyGuessedCell, _directionForAICheck);
+                counter++;
+            }
+
+            ReturnStackWithCellRemoved(_playerBoardStack, neighbor);
+
+            guessedCell = neighbor;
+            result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
+
+            if (result == MarkerType.HIT) _keepDirection = true;
+        }
+    }
+
+    private void MoveClockwise()
+    {
+        if (_directionForAICheck == Vector2.up) _directionForAICheck = Vector2.right;
+        else if (_directionForAICheck == Vector2.right) _directionForAICheck = Vector2.down;
+        else if (_directionForAICheck == Vector2.down) _directionForAICheck = Vector2.left;
+        else if (_directionForAICheck == Vector2.left) _directionForAICheck = Vector2.up;
+    }
+
+    private Cell GetCellNeighbor(Cell cell, Vector2 direction)
+    {
+        var potentialNeighbor = GetCellByGridIndex(_playerBoardGrid, new Vector2(cell.GetGridLocation().x + direction.x, cell.GetGridLocation().y + direction.y));
+        return potentialNeighbor == null ? null : potentialNeighbor;
+    }
+
+    private Vector2 GetRandomDirectionVector()
+    {
+        var directionsAsArray = Enum.GetValues(typeof(Direction));
+        var randomDirectionIndex = Random.Range(0, directionsAsArray.Length);
+        var randomDirection = (Direction) directionsAsArray.GetValue(randomDirectionIndex);
+        
+        return randomDirection switch
+        {
+            Direction.NORTH => new Vector2(0, 1),
+            Direction.EAST => new Vector2(1, 0),
+            Direction.SOUTH => new Vector2(0, -1),
+            Direction.WEST => new Vector2(-1, 0),
+            _ => new Vector2()
+        };
+    }
+
+    private void ReturnStackWithCellRemoved(Stack<Cell> stackOfCells, Cell cellToRemove)
+    {
+        var tempStackToList = stackOfCells.ToList();
+        tempStackToList.RemoveAt(tempStackToList.IndexOf(cellToRemove));
+        stackOfCells = new Stack<Cell>(ToStack(tempStackToList));
+    }
+    
+    // TODO: Definitely move this out of BoardManager later
+    private List<T> Shuffle<T> (List<T> listToShuffle)
+    {
+        for (var i = listToShuffle.Count - 1; i > 0; i--)
+        {
+            var randomIndex = Random.Range(0, i);
+            (listToShuffle[i], listToShuffle[randomIndex]) = (listToShuffle[randomIndex], listToShuffle[i]);
         }
 
-        var guessedCell = GetCellByGridIndex(_playerBoardGrid, randomVector);
-        
-        var result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
-        
-        guessedCell.SetMarker(result);
-        
-        if (result == MarkerType.HIT)
-            guessedCell.GetOccupyingShip().MarkShipAsHit();
+        return listToShuffle;
+    }
+    
+    // TODO: Definitely move this out of BoardManager later
+    private Stack<T> ToStack<T>(List<T> listToConvert)
+    {
+        var stack = new Stack<T>();
+        foreach (var item in listToConvert)
+            stack.Push(item);
 
-        print($"Enemy {result} at ({randomVector.x}, {randomVector.y})!");
-        
-        _gameManager.SetCanPlaceMarkers(true);
-        _gameManager.SetPlayerTurn();
-        print("Player's turn!");
-
+        return stack;
     }
 
     private void GenerateEnemyShipPlacements()
