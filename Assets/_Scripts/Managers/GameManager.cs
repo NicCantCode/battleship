@@ -6,7 +6,6 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private ShipOwner turnIndicator;
     [SerializeField] private bool _canPlaceMarkers;
     [SerializeField] private bool _isDragEnabled;
     [SerializeField] private List<Cell> _shipBearingCells;
@@ -15,21 +14,10 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        turnIndicator = ShipOwner.PLAYER;
         _shipBearingCells = new List<Cell>();
         _canPlaceMarkers = false;
         playerShipsLeft = 5;
         enemyShipsLeft = 5;
-    }
-
-    public void SetPlayerTurn()
-    {
-        turnIndicator = ShipOwner.PLAYER;
-    }
-
-    public void SetEnemyTurn()
-    {
-        turnIndicator = ShipOwner.ENEMY;
     }
 
     public void SubtractFromEnemyShipPool()
