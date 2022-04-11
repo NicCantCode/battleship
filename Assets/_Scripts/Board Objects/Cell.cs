@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Cell : MonoBehaviour
 {
@@ -8,6 +7,7 @@ public class Cell : MonoBehaviour
     
     private GameManager _gameManager;
     private BoardManager _boardManager;
+    private LogManager _logManager;
     private GameObject _cellMarker;
     private ShipType _occupiedShipType;
     private Ship _occupiedShip;
@@ -22,11 +22,7 @@ public class Cell : MonoBehaviour
         _occupiedShipType = ShipType.NONE;
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _boardManager = GameObject.FindGameObjectWithTag("Board Manager").GetComponent<BoardManager>();
-    }
-
-    public void DebugSetMarker()
-    {
-        SetMarker(MarkerType.HIT);
+        _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
     }
 
     public void SetMarker(MarkerType markerType)
@@ -104,9 +100,9 @@ public class Cell : MonoBehaviour
                 var result = _hasShip ? MarkerType.HIT : MarkerType.MISS;
                 SetMarker(result);
                 
-                if (_hasShip) _occupiedShip.MarkShipAsHit();
+                _logManager.LogMessage($"Player {result} at ({_gridLocation.x}, {_gridLocation.y})!", result == MarkerType.HIT ? Color.red : Color.white);
                 
-                print($"Player {result} at ({_gridLocation.x}, {_gridLocation.y})!");
+                if (_hasShip) _occupiedShip.MarkShipAsHit();
                 
                 _boardManager.EnemyTurnStart();
                 return;

@@ -1,16 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private bool _canPlaceMarkers;
     [SerializeField] private bool _isDragEnabled;
-    [SerializeField] private List<Cell> _shipBearingCells;
     [SerializeField] private int playerShipsLeft;
     [SerializeField] private int enemyShipsLeft;
+    [SerializeField] private List<Cell> _shipBearingCells;
 
     private void Awake()
     {
