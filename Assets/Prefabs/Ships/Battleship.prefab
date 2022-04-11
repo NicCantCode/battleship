@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1325392986349436067}
   - component: {fileID: 1325392986349436076}
   - component: {fileID: 1325392986349436066}
-  - component: {fileID: 6158006854792040945}
   - component: {fileID: 5606495696701956573}
+  - component: {fileID: 5536608010747144701}
   m_Layer: 0
   m_Name: Battleship Sprite
   m_TagString: Untagged
@@ -97,21 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6574bafdfa048b48bcf590e451ba64a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6158006854792040945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1325392986349436077}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f754aaf857996bc4cb65c712ce196164, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shipSize: 4
-  shipType: 1
-  shipOwner: 0
 --- !u!65 &5606495696701956573
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -125,6 +110,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 0.5, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5536608010747144701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1325392986349436077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 294532c0ace382240840cb04d687124c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isPlaced: 0
+  shipSize: 4
+  shipType: 1
+  shipOwner: 0
 --- !u!1 &1325392986558421643
 GameObject:
   m_ObjectHideFlags: 0

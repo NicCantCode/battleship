@@ -42,8 +42,8 @@ GameObject:
   - component: {fileID: 5815529168070651590}
   - component: {fileID: 5815529168070651585}
   - component: {fileID: 5815529168070651591}
-  - component: {fileID: 6496336006435724485}
   - component: {fileID: 5559450274850767303}
+  - component: {fileID: 8763744222457516294}
   m_Layer: 0
   m_Name: Destroyer Sprite
   m_TagString: Untagged
@@ -128,21 +128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6574bafdfa048b48bcf590e451ba64a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6496336006435724485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5815529168070651589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee0007ca49e32b34eb50b5e09a36b991, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shipSize: 2
-  shipType: 4
-  shipOwner: 0
 --- !u!65 &5559450274850767303
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -156,3 +141,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 0.5, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8763744222457516294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5815529168070651589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 294532c0ace382240840cb04d687124c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isPlaced: 0
+  shipSize: 2
+  shipType: 4
+  shipOwner: 0
