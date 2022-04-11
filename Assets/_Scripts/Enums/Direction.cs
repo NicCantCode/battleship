@@ -1,7 +1,7 @@
-﻿namespace _Scripts.Enums
+﻿public enum Direction
 {
-    public enum Direction
-    {
-        
-    }
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST 
 }
