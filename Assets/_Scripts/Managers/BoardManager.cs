@@ -7,8 +7,6 @@ using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
-    private enum Direction { NORTH, EAST, SOUTH, WEST }
-    
     private const float CellSize = 0.5f;
     
     [SerializeField] private Transform playerBoardParent;
@@ -35,16 +33,18 @@ public class BoardManager : MonoBehaviour
     // Debug
     public Vector2 gridSize = new Vector2(5, 5);
     private GameManager _gameManager;
+    private LogManager _logManager;
 
     private void Awake()
     {
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
+        _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
     }
 
     public void BuildPlayerBoard()
     {
         BuildBoard(BoardWidth, BoardHeight, playerBoardParent, true);
-        _playerBoardStack = ToStack(Shuffle(new List<Cell>(_playerBoardGrid)));
+        _playerBoardStack = Utils.ToStack(Utils.Shuffle(new List<Cell>(_playerBoardGrid)));
     }
 
     public void BuildTargetingBoard()
@@ -66,17 +66,18 @@ public class BoardManager : MonoBehaviour
     IEnumerator EnemyTurnStartCoroutine()
     {
         _gameManager.SetCanPlaceMarkers(false);
-        print("Enemy's turn!");
+        _logManager.LogMessage("Enemy's turn!", Color.yellow);
         
         yield return new WaitForSecondsRealtime(0); // Debug
         
         AISimple(out var guessedCell, out var result); // DO AI
         
+        _logManager.LogMessage($"Enemy {result} at ({guessedCell.GetGridLocation().x}, {guessedCell.GetGridLocation().y})!", result == MarkerType.HIT ? Color.red : Color.white);
+        
         if (result == MarkerType.HIT) guessedCell.GetOccupyingShip().MarkShipAsHit();
         
-        print($"Enemy {result} at ({guessedCell.GetGridLocation().x}, {guessedCell.GetGridLocation().y})!");
         _gameManager.SetCanPlaceMarkers(true);
-        print("Player's turn!");
+        _logManager.LogMessage("Player's turn!", Color.green);
     }
     
     // This AI chooses a random cell each turn using a randomized stack of the board cells
@@ -91,123 +92,8 @@ public class BoardManager : MonoBehaviour
     // This AI chooses a random cell each turn until a ship is hit, than chooses cells in the vicinity of the hit ship
     private void AIIntermediate(out Cell guessedCell, out MarkerType result)
     {
-        // Get guessed cell from shuffled stack
-        // If Cell has no ship, simply return MISS result
-        // If Cell has a ship, set foundShip to true and previouslyGuessedCell to guessedCell
-        // Use previouslyGuessedCell and helper function to look at cells around this cell for hits
-        // When a hit is found, continue in the direction of that hit until a miss is found
-        // When miss is found go in opposite direction until another miss is found
-        // Set foundShip to false
-        // Repeat
-        
-        
-        if (!_foundShip)
-        {
-            guessedCell = _playerBoardStack.Pop();
-            result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
-
-            if (result == MarkerType.MISS)
-            {
-                result = MarkerType.MISS;
-                _foundShip = false;
-            }
-
-            if (result == MarkerType.HIT)
-            {
-                _foundShip = true;
-                _previouslyGuessedCell = guessedCell;
-                
-            }
-        }
-        else
-        {
-            // Get cell neighboring previouslyGuessedCell
-            // Check it, mark it
-            // If miss, try new direction next turn
-            // If hit, continue in that direction every turn until a miss is found
-            // Reverse direction and continue until a miss is found
-            // Set foundShip to false
-
-
-            if (!_keepDirection) _directionForAICheck = GetRandomDirectionVector();
-            
-            var neighbor = GetCellNeighbor(_previouslyGuessedCell, _directionForAICheck);
-
-            var counter = 0;
-            
-            while (neighbor == null || neighbor.GetHasMarker() || counter < 4)
-            {
-                MoveClockwise();
-                neighbor = GetCellNeighbor(_previouslyGuessedCell, _directionForAICheck);
-                counter++;
-            }
-
-            ReturnStackWithCellRemoved(_playerBoardStack, neighbor);
-
-            guessedCell = neighbor;
-            result = guessedCell.GetShipState() ? MarkerType.HIT : MarkerType.MISS;
-
-            if (result == MarkerType.HIT) _keepDirection = true;
-        }
-    }
-
-    private void MoveClockwise()
-    {
-        if (_directionForAICheck == Vector2.up) _directionForAICheck = Vector2.right;
-        else if (_directionForAICheck == Vector2.right) _directionForAICheck = Vector2.down;
-        else if (_directionForAICheck == Vector2.down) _directionForAICheck = Vector2.left;
-        else if (_directionForAICheck == Vector2.left) _directionForAICheck = Vector2.up;
-    }
-
-    private Cell GetCellNeighbor(Cell cell, Vector2 direction)
-    {
-        var potentialNeighbor = GetCellByGridIndex(_playerBoardGrid, new Vector2(cell.GetGridLocation().x + direction.x, cell.GetGridLocation().y + direction.y));
-        return potentialNeighbor == null ? null : potentialNeighbor;
-    }
-
-    private Vector2 GetRandomDirectionVector()
-    {
-        var directionsAsArray = Enum.GetValues(typeof(Direction));
-        var randomDirectionIndex = Random.Range(0, directionsAsArray.Length);
-        var randomDirection = (Direction) directionsAsArray.GetValue(randomDirectionIndex);
-        
-        return randomDirection switch
-        {
-            Direction.NORTH => new Vector2(0, 1),
-            Direction.EAST => new Vector2(1, 0),
-            Direction.SOUTH => new Vector2(0, -1),
-            Direction.WEST => new Vector2(-1, 0),
-            _ => new Vector2()
-        };
-    }
-
-    private void ReturnStackWithCellRemoved(Stack<Cell> stackOfCells, Cell cellToRemove)
-    {
-        var tempStackToList = stackOfCells.ToList();
-        tempStackToList.RemoveAt(tempStackToList.IndexOf(cellToRemove));
-        stackOfCells = new Stack<Cell>(ToStack(tempStackToList));
-    }
-    
-    // TODO: Definitely move this out of BoardManager later
-    private List<T> Shuffle<T> (List<T> listToShuffle)
-    {
-        for (var i = listToShuffle.Count - 1; i > 0; i--)
-        {
-            var randomIndex = Random.Range(0, i);
-            (listToShuffle[i], listToShuffle[randomIndex]) = (listToShuffle[randomIndex], listToShuffle[i]);
-        }
-
-        return listToShuffle;
-    }
-    
-    // TODO: Definitely move this out of BoardManager later
-    private Stack<T> ToStack<T>(List<T> listToConvert)
-    {
-        var stack = new Stack<T>();
-        foreach (var item in listToConvert)
-            stack.Push(item);
-
-        return stack;
+        guessedCell = null;
+        result = MarkerType.HIT;
     }
 
     private void GenerateEnemyShipPlacements()
@@ -222,18 +108,14 @@ public class BoardManager : MonoBehaviour
             var randomY = Random.Range(0, BoardHeight);
             var randomDirectionIndex = Random.Range(0, directionsAsArray.Length);
             var randomDirection = (Direction) directionsAsArray.GetValue(randomDirectionIndex);
-            
-            //print($"({randomX}, {randomY}) in the {randomDirection} direction.");
-            
+
             var validCells = GetValidCellsFromPosition(new Vector2(randomX, randomY), randomDirection, shipSizes);
 
             if (validCells == null) continue;
-            //print("Cells are valid!");
 
             CreateFauxShip(validCells[0].GetShipType(), new Queue<Cell>(validCells));
             
             _enemyOccupiedCells.AddRange(validCells);
-            //DebugEnemyShipLocations();
             
             counter++;
         }
@@ -249,41 +131,12 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private void DebugEnemyShipLocations()
-    {
-        foreach (var cell in _enemyOccupiedCells)
-        {
-            cell.DebugSetMarker();
-        }
-    }
-
     private void CreateFauxShip(ShipType shipType, Queue<Cell> occupiedCells)
     {
         var shipObject = new GameObject(ReturnShipNameByType(shipType));
         shipObject.transform.SetParent(enemyShipParent);
 
-        Ship ship;
-        switch (shipType)
-        {
-            case ShipType.CARRIER:
-                ship = shipObject.AddComponent<Carrier>();
-                break;
-            case ShipType.BATTLESHIP:
-                ship = shipObject.AddComponent<Battleship>();
-                break;
-            case ShipType.CRUISER:
-                ship = shipObject.AddComponent<Cruiser>();
-                break;
-            case ShipType.SUBMARINE:
-                ship = shipObject.AddComponent<Submarine>();
-                break;
-            case ShipType.DESTROYER:
-                ship = shipObject.AddComponent<Destroyer>();
-                break;
-            default:
-                ship = shipObject.AddComponent<Carrier>();
-                break;
-        }
+        var ship = shipObject.AddComponent<Ship>();
 
         ship.SetOccupiedCells(occupiedCells);
         ship.SetShipType(shipType);
@@ -328,13 +181,10 @@ public class BoardManager : MonoBehaviour
     private List<Cell> GetValidCellsFromPosition(Vector2 cellPosition, Direction startingDirection, List<int> shipSizes)
     {
         var cellToCheck = GetCellByGridIndex(_enemyBoardGrid, cellPosition);
-        //print(cellToCheck.name);
-        //print($"Does Cell Contain Ship? {cellToCheck.GetShipState()}");
         
         if (cellToCheck == null || cellToCheck.GetShipState()) return null;
         
         var randomShipSize = shipSizes[Random.Range(0, shipSizes.Count)];
-        //print($"Ship size to check: {randomShipSize}");
 
         var isValid = CheckDirectionsFromCell(cellToCheck, startingDirection, randomShipSize, out var validCells);
 
@@ -384,8 +234,7 @@ public class BoardManager : MonoBehaviour
         for (var i = 1; i < shipSizeToCheck; i++)
         {
             var cell = GetCellByGridIndex(_enemyBoardGrid, cellToCheck.GetGridLocation() + directionVector * i);
-            //print($"Ship Size {shipSizeToCheck}: Check {i}");
-            //if (cell != null) print(cell.GetShipState());
+            
             if (cell == null || cell.GetShipState())
             {
                 isDirectionValid = false;
