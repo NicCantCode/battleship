@@ -9,6 +9,7 @@ TagManager:
   - Ship Manager
   - Log Manager
   - AI Manager
+  - Difficulty Manager
   layers:
   - Default
   - TransparentFX
