@@ -32,7 +32,7 @@ public class AIManager : MonoBehaviour
         
         yield return new WaitForSecondsRealtime(0); // Debug
         
-        DoAI(Difficulty.SIMPLE, out var guessedCell, out var result); // DO AI
+        DoAI(DifficultyManager.Instance.difficulty, out var guessedCell, out var result); // DO AI
         
         _logManager.LogMessage($"Enemy {result} at ({guessedCell.GetGridLocation().x}, {guessedCell.GetGridLocation().y})!", result == MarkerType.HIT ? Color.red : Color.white);
         
@@ -72,7 +72,8 @@ public class AIManager : MonoBehaviour
     }
 
     // TODO: Come back to AIIntermediate later with a fresh mind.
-    // This AI chooses a random cell each turn until a ship is hit, than chooses cells in the vicinity of the hit ship
+    // This AI chooses a random cell each turn using a randomized stack of the board cells
+    // This AI is hit ship aware and will progressively search around hit markers for the ship
     private void AIIntermediate(Stack<Cell> playerBoard, out Cell guessedCell, out MarkerType result)
     {
         guessedCell = null;
