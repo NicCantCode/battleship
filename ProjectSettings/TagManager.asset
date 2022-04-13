@@ -8,6 +8,7 @@ TagManager:
   - Board Manager
   - Ship Manager
   - Log Manager
+  - AI Manager
   layers:
   - Default
   - TransparentFX
