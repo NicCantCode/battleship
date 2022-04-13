@@ -6,8 +6,8 @@ public class Cell : MonoBehaviour
     [SerializeField] private Markers markers;
     
     private GameManager _gameManager;
-    private BoardManager _boardManager;
     private LogManager _logManager;
+    private AIManager _aiManager;
     private GameObject _cellMarker;
     private ShipType _occupiedShipType;
     private Ship _occupiedShip;
@@ -21,8 +21,8 @@ public class Cell : MonoBehaviour
     {
         _occupiedShipType = ShipType.NONE;
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
-        _boardManager = GameObject.FindGameObjectWithTag("Board Manager").GetComponent<BoardManager>();
         _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
+        _aiManager = GameObject.FindGameObjectWithTag("AI Manager").GetComponent<AIManager>();
     }
 
     public void SetMarker(MarkerType markerType)
@@ -104,7 +104,7 @@ public class Cell : MonoBehaviour
                 
                 if (_hasShip) _occupiedShip.MarkShipAsHit();
                 
-                _boardManager.EnemyTurnStart();
+                _aiManager.EnemyTurnStart();
                 return;
             case true:
                 return;

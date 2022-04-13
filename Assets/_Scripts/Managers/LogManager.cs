@@ -5,6 +5,7 @@ public class LogManager : MonoBehaviour
 {
     [SerializeField] private GameObject logWindowUIElement;
     [SerializeField] private GameObject logMessagePrefab;
+    [SerializeField] private float verticalLogWindowSpacing;
 
     public void LogMessage(string message, Color textColor)
     {
@@ -18,7 +19,7 @@ public class LogManager : MonoBehaviour
     private void ExpandViewportForNewMessage()
     {
         var rect = logWindowUIElement.GetComponent<RectTransform>();
-        var messageRectHeight = logMessagePrefab.GetComponent<RectTransform>().rect.height;
+        var messageRectHeight = logMessagePrefab.GetComponent<RectTransform>().rect.height + verticalLogWindowSpacing;
         var sizeDelta = rect.sizeDelta;
         var position = rect.position;
         
