@@ -5,31 +5,6 @@ using Random = UnityEngine.Random;
 
 public static class ShipUtils
 {
-    public static int GetShipSizeByType(ShipType shipType)
-    {
-        var shipSize = shipType switch
-        {
-            ShipType.CARRIER => 5,
-            ShipType.BATTLESHIP => 4,
-            ShipType.CRUISER => 3,
-            ShipType.SUBMARINE => 3,
-            ShipType.DESTROYER => 2,
-            _ => 0
-        };
-
-        return shipSize;
-    }
-    
-    public static string ReturnShipNameByType(ShipType shipType)
-    {
-        var shipName = "Enemy ";
-
-        shipName += shipType.ToString().Substring(0,1);
-        shipName += shipType.ToString().Substring(1).ToLower();
-
-        return shipName;
-    }
-
     public static List<Cell> GetValidCellsFromPosition(List<Cell> enemyBoardGrid, Vector2 cellPosition, Direction startingDirection, List<int> shipSizes)
     {
         var cellToCheck = GetCellByGridIndex(enemyBoardGrid, cellPosition);
@@ -52,7 +27,7 @@ public static class ShipUtils
         
         return !isValid ? null : validCells;
     }
-    
+
     public static void SetCellOccupiedShip(List<Cell> enemyOccupiedCells, List<Ship> enemyShips)
     {
         foreach (var cell in enemyOccupiedCells)
@@ -60,7 +35,7 @@ public static class ShipUtils
             cell.SetOccupyingShip(enemyShips.First(s => s.ShipType == cell.GetShipType()));
         }
     }
-    
+
     public static void CreateFauxShip(List<Ship> enemyShips, Transform enemyShipParent, ShipType shipType, Queue<Cell> occupiedCells)
     {
         var shipObject = new GameObject(ReturnShipNameByType(shipType));
@@ -81,6 +56,31 @@ public static class ShipUtils
 
         enemyShips.Add(ship);
 
+    }
+
+    public static int GetShipSizeByType(ShipType shipType)
+    {
+        var shipSize = shipType switch
+        {
+            ShipType.CARRIER => 5,
+            ShipType.BATTLESHIP => 4,
+            ShipType.CRUISER => 3,
+            ShipType.SUBMARINE => 3,
+            ShipType.DESTROYER => 2,
+            _ => 0
+        };
+
+        return shipSize;
+    }
+
+    public static string ReturnShipNameByType(ShipType shipType)
+    {
+        var shipName = "Enemy ";
+
+        shipName += shipType.ToString().Substring(0,1);
+        shipName += shipType.ToString().Substring(1).ToLower();
+
+        return shipName;
     }
 
     public static ShipType GetShipTypeBySize(int randomShipSize, List<int> shipSizes)
