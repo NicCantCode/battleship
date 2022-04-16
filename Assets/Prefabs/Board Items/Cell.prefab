@@ -154,4 +154,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   markers: {fileID: 11400000, guid: 6ba0a0b99e834eb4cb9537b5fad7637b, type: 2}
+  spriteRenderer: {fileID: 580231824738309773}
   _gridLocation: {x: 0, y: 0}

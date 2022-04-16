@@ -775,6 +775,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd0bd841b0ed93c478c5660cb31b6521, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCellColor: {r: 0.12941177, g: 0.3764706, b: 0.5882353, a: 1}
+  enemyCellColor: {r: 0, g: 0.4528302, b: 0, a: 1}
   cellPrefab: {fileID: 580231825475028412, guid: 87f7c5d2e107a7a41a75e0efab2be59a, type: 3}
   playerBoardParent: {fileID: 1416369515}
   targetingBoardParent: {fileID: 800814206}
