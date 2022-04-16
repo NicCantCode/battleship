@@ -58,6 +58,24 @@ public static class ShipUtils
 
     }
 
+    public static Vector2 GetVectorByDirection(Direction direction)
+    {
+        return direction switch
+        {
+            Direction.EAST => new Vector2(1, 0),
+            Direction.WEST => new Vector2(-1, 0),
+            Direction.SOUTH => new Vector2(0, -1),
+            Direction.NORTH => new Vector2(0, 1),
+            _ => new Vector2()
+        };
+    }
+
+    public static bool CheckIfCellIsInsideBoardBounds(Vector2 boardSize, Vector2 cellGridLocation)
+    {
+        return cellGridLocation.x >= 0 && cellGridLocation.x < boardSize.x && 
+               cellGridLocation.y >= 0 && cellGridLocation.y < boardSize.y;
+    }
+    
     public static int GetShipSizeByType(ShipType shipType)
     {
         var shipSize = shipType switch
@@ -104,14 +122,7 @@ public static class ShipUtils
         var isDirectionValid = true;
         validCells = new List<Cell> { cellToCheck };
 
-        var directionVector = startingDirection switch
-        {
-            Direction.EAST => new Vector2(1, 0),
-            Direction.WEST => new Vector2(-1, 0),
-            Direction.SOUTH => new Vector2(0, -1),
-            Direction.NORTH => new Vector2(0, 1),
-            _ => new Vector2()
-        };
+        var directionVector = GetVectorByDirection(startingDirection);
 
         for (var i = 1; i < shipSizeToCheck; i++)
         {
