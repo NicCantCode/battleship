@@ -17,7 +17,7 @@ public class Ship : MonoBehaviour
     private bool _isSunk;
     public bool IsSunk => _isSunk;
 
-    private bool _isPlaced;
+    [SerializeField] private bool _isPlaced;
     public bool IsPlaced => _isPlaced;
 
     [SerializeField] private int shipSize;
