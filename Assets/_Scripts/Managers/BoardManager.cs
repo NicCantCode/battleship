@@ -26,22 +26,35 @@ public class BoardManager : MonoBehaviour
     private List<Ship> _enemyShips = new List<Ship>();
     
     private AIManager _aiManager;
+    private LogManager _logManager;
+    private AnimationManager _animationManager;
 
     private void Awake()
     {
         _aiManager = GameObject.FindGameObjectWithTag("AI Manager").GetComponent<AIManager>();
+        _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
+        _animationManager = GameObject.FindGameObjectWithTag("Animation Manager").GetComponent<AnimationManager>();
     }
 
-    public void BuildPlayerBoard()
+    private void Start()
+    {
+        BuildPlayerBoard();
+    }
+
+    private void BuildPlayerBoard()
     {
         BuildBoard(BoardWidth, BoardHeight, playerBoardParent, true);
         _aiManager.SetPlayerBoardStack(Utils.ToStack(Utils.Shuffle(new List<Cell>(_playerBoardGrid))));
+        _animationManager.PlayerBoardEnterAnimation();
+        _logManager.LogMessage("Ship placement has begun!", Color.gray);
     }
 
     public void BuildTargetingBoard()
     {
         BuildBoard(BoardWidth, BoardHeight, targetingBoardParent, false);
         GenerateEnemyShipPlacements();
+        _animationManager.TargetingBoardEnterAnimation();
+        _logManager.LogMessage("Player's turn!", Color.green);
     }
 
     private void BuildBoard(int width, int height, Transform parent, bool isPlayerBoard)
