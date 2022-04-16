@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DragAndSnap : MonoBehaviour
 {
+    [SerializeField] private Vector3 positionToResetTo;
+    
     private Camera _mainCamera;
     private bool _isValidShipPosition;
 
@@ -17,7 +19,7 @@ public class DragAndSnap : MonoBehaviour
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _mainCamera = Camera.main;
         _thisShip = GetComponent<Ship>();
-        _originalShipPosition = transform.position;
+        _originalShipPosition = positionToResetTo;
         _gameManager.SetDragEnabled(true);
     }
 
@@ -88,7 +90,7 @@ public class DragAndSnap : MonoBehaviour
 
     private void ResetShipTransform(bool rotationReset)
     {
-        transform.position = _originalShipPosition;
+        transform.localPosition = _originalShipPosition;
         if (rotationReset) transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
