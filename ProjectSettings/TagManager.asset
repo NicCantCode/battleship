@@ -10,6 +10,7 @@ TagManager:
   - Log Manager
   - AI Manager
   - Difficulty Manager
+  - Animation Manager
   layers:
   - Default
   - TransparentFX
