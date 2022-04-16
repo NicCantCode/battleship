@@ -11,6 +11,9 @@ public class BoardManager : MonoBehaviour
     private const int BoardHeight = 10;
     private const float CellSize = 0.5f;
 
+    [SerializeField] private Color playerCellColor;
+    [SerializeField] private Color enemyCellColor;
+
     [SerializeField] private GameObject cellPrefab;
     [SerializeField] private Transform playerBoardParent;
     [SerializeField] private Transform targetingBoardParent;
@@ -55,10 +58,12 @@ public class BoardManager : MonoBehaviour
                 
                 if (isPlayerBoard)
                 {
+                    cellComponent.SetCellColor(playerCellColor);
                     _playerBoardGrid.Add(cellComponent);
                 }
                 else
                 {
+                    cellComponent.SetCellColor(enemyCellColor);
                     _enemyBoardGrid.Add(cellComponent);
                 }
             }

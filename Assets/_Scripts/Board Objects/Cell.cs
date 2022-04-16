@@ -16,6 +16,7 @@ public class Cell : MonoBehaviour
     private bool _hasShip;
     private bool _isInPlayerBoard;
 
+    [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Vector2 _gridLocation;
 
     private void Awake()
@@ -24,6 +25,11 @@ public class Cell : MonoBehaviour
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
         _aiManager = GameObject.FindGameObjectWithTag("AI Manager").GetComponent<AIManager>();
+    }
+
+    public void SetCellColor(Color color)
+    {
+        spriteRenderer.color = color;
     }
 
     public void SetMarker(MarkerType markerType)
