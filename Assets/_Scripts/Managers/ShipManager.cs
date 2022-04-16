@@ -1,60 +1,48 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ShipManager : MonoBehaviour
 {
-    [SerializeField] private Transform shipParent;
-    [SerializeField] private List<GameObject> shipList = new List<GameObject>();
+    [SerializeField] private List<Ship> spawnedShips;
     
-    private readonly List<Ship> _spawnedShips = new List<Ship>();
     private GameManager _gameManager;
     private BoardManager _boardManager;
+    private LogManager _logManager;
+    private AnimationManager _animationManager;
 
     private void Awake()
     {
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _boardManager = GameObject.FindGameObjectWithTag("Board Manager").GetComponent<BoardManager>();
-    }
-
-    public void SpawnPlayerShips()
-    {
-        SpawnShips(shipParent);
+        _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
+        _animationManager = GameObject.FindGameObjectWithTag("Animation Manager").GetComponent<AnimationManager>();
     }
     
     public void SetFinishedPlacingShips()
     {
-        var allShipsPlaced = false;
-        foreach (var ship in _spawnedShips)
+        if (!AreAllShipsPlaced())
         {
-            if (!ship.IsPlaced)
-            {
-                allShipsPlaced = false;
-                continue;
-            }
-
-            allShipsPlaced = true;
+            _logManager.LogMessage("Finish placing your ships!", Color.red);
+            return;
         }
-
-        if (!allShipsPlaced) return;
+        
         _gameManager.SetDragEnabled(false);
 
         foreach (var cell in _boardManager.GetPlayerBoardGrid())
         {
             cell.GetComponent<Collider2D>().enabled = false;
         }
-
+        
+        _logManager.LogMessage("Ship placement has ended!", Color.gray);
+        _boardManager.BuildTargetingBoard();
+        _animationManager.GrowLogAnimation();
+        
     }
 
-    private void SpawnShips(Transform parent)
+    private bool AreAllShipsPlaced()
     {
-        var offset = new Vector3(0, 0, 0);
-        var thisPosition = parent.transform.position;
-        
-        foreach (var ship in shipList)
-        {
-            var spawnedShip = Instantiate(ship, new Vector3(thisPosition.x + offset.x, thisPosition.y + offset.y, -0.5f), Quaternion.identity, parent);
-            _spawnedShips.Add(spawnedShip.GetComponentInChildren<Ship>());
-            offset.y += 0.5f;
-        }
+        return spawnedShips.All(ship => ship.IsPlaced);
     }
 }
