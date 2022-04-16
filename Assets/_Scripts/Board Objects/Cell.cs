@@ -4,7 +4,8 @@ using UnityEngine;
 public class Cell : MonoBehaviour
 {
     [SerializeField] private Markers markers;
-    
+
+    private MarkerType _markerType;
     private GameManager _gameManager;
     private LogManager _logManager;
     private AIManager _aiManager;
@@ -36,15 +37,22 @@ public class Cell : MonoBehaviour
         {
             case MarkerType.HIT:
                 _cellMarker = Instantiate(markers.hitMarkerPrefab, new Vector3(thisPosition.x, thisPosition.y, -0.7f), Quaternion.identity, thisTransform);
+                _markerType = MarkerType.HIT;
                 _hasMarker = true;
                 break;
             case MarkerType.MISS:
                 _cellMarker = Instantiate(markers.missMarkerPrefab, new Vector3(thisPosition.x, thisPosition.y, -0.7f), Quaternion.identity, thisTransform);
+                _markerType = MarkerType.MISS;
                 _hasMarker = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(markerType), markerType, "Marker ID Doesn't Exist.");
         }
+    }
+
+    public MarkerType GetMarkerType()
+    {
+        return _markerType;
     }
 
     private void RemoveMarker()
@@ -100,7 +108,7 @@ public class Cell : MonoBehaviour
                 var result = _hasShip ? MarkerType.HIT : MarkerType.MISS;
                 SetMarker(result);
                 
-                _logManager.LogMessage($"Player {result} at ({_gridLocation.x}, {_gridLocation.y})!", result == MarkerType.HIT ? Color.red : Color.white);
+                _logManager.LogMessage($"Player {result} at {Utils.GridPositionToBattleshipPositionAsString(_gridLocation)}!", result == MarkerType.HIT ? Color.red : Color.white);
                 
                 if (_hasShip) _occupiedShip.MarkShipAsHit();
                 

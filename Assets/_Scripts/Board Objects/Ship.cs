@@ -14,6 +14,9 @@ public class Ship : MonoBehaviour
     private Queue<Cell> _occupiedCells;
     public Queue<Cell> OccupiedCells => _occupiedCells;
 
+    private bool _isSunk;
+    public bool IsSunk => _isSunk;
+
     private bool _isPlaced;
     public bool IsPlaced => _isPlaced;
 
@@ -26,13 +29,13 @@ public class Ship : MonoBehaviour
     [SerializeField] private ShipOwner shipOwner;
     public ShipOwner ShipOwner => shipOwner;
 
-
     private void Awake()
     {
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
         _occupiedCells = new Queue<Cell>(shipSize);
         _isPlaced = false;
+        _isSunk = false;
     }
     
     private void SinkShip()
@@ -53,6 +56,11 @@ public class Ship : MonoBehaviour
     private GameManager GetGameManagerReference()
     {
         return _gameManager;
+    }
+
+    public void SetIsSunk(bool isSunk)
+    {
+        _isSunk = isSunk;
     }
 
     public void SetIsPlaced(bool isPlaced)
@@ -116,6 +124,7 @@ public class Ship : MonoBehaviour
         // If the number of hits equals the total size of the ship, it will sink.
         if (_hitCounter >= shipSize)
         {
+            _isSunk = true;
             SinkShip();
         }
     }
