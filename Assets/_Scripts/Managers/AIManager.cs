@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AIManager : MonoBehaviour
 {
@@ -45,6 +46,7 @@ public class AIManager : MonoBehaviour
         _gameManager.SetCanPlaceMarkers(false);
         _logManager.LogMessage("Enemy's turn!", Color.yellow);
         
+        //yield return new WaitForSecondsRealtime(Random.Range(1,6));
         yield return new WaitForSecondsRealtime(0); // Debug
         
         DoAI(DifficultyManager.Instance.difficulty, out var guessedCell, out var result);
