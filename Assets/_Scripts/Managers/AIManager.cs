@@ -44,8 +44,7 @@ public class AIManager : MonoBehaviour
         
         _logManager.LogMessage("Enemy's turn!", Color.yellow);
         
-        //yield return new WaitForSecondsRealtime(Random.Range(1,6));
-        yield return new WaitForSecondsRealtime(0); // Debug
+        yield return new WaitForSecondsRealtime(Random.Range(1,6));
 
         DoAI(DifficultyManager.Instance.difficulty, out var guessedCell, out var result);
         
