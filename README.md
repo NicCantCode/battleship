@@ -2,7 +2,9 @@
 
 This game aims to re-create the Battleship board game in the digital space with a 2D top-down view. It will have all the basic functionality of the board game along with an AI. AI difficulty/ability will be determined by time left to develop.
 
-Developed in **2020.3.32f1**.
+Started in **2020.3.32f1**.
+
+Finished in **2020.3.33f1**.
 
 ## Links
 
