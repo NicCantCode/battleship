@@ -1,11 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShipManager : MonoBehaviour
 {
     [SerializeField] private List<Ship> spawnedShips;
+    [SerializeField] private Button beginGameButton;
     
     private GameManager _gameManager;
     private BoardManager _boardManager;
@@ -29,6 +31,8 @@ public class ShipManager : MonoBehaviour
         }
         
         _gameManager.SetDragEnabled(false);
+        beginGameButton.interactable = false;
+        beginGameButton.GetComponentInChildren<TextMeshProUGUI>().text = "Good\nLuck!";
 
         foreach (var cell in _boardManager.GetPlayerBoardGrid())
         {

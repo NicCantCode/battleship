@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
@@ -18,12 +17,13 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Transform playerBoardParent;
     [SerializeField] private Transform targetingBoardParent;
     [SerializeField] private Transform enemyShipParent;
+    [SerializeField] private List<Slider> enemyShipSliders;
 
-    private List<Cell> _playerBoardGrid = new List<Cell>();
-    private List<Cell> _enemyBoardGrid = new List<Cell>();
+    private readonly List<Cell> _playerBoardGrid = new List<Cell>();
+    private readonly List<Cell> _enemyBoardGrid = new List<Cell>();
 
-    private List<Cell> _enemyOccupiedCells = new List<Cell>();
-    private List<Ship> _enemyShips = new List<Ship>();
+    private readonly List<Cell> _enemyOccupiedCells = new List<Cell>();
+    private readonly List<Ship> _enemyShips = new List<Ship>();
     
     private AIManager _aiManager;
     private LogManager _logManager;
@@ -47,6 +47,7 @@ public class BoardManager : MonoBehaviour
         _aiManager.SetPlayerBoardStack(Utils.ToStack(Utils.Shuffle(new List<Cell>(_playerBoardGrid))));
         _animationManager.PlayerBoardEnterAnimation();
         _logManager.LogMessage("Ship placement has begun!", Color.gray);
+        _logManager.LogMessage("Use the R key to rotate!", Color.cyan);
     }
 
     public void BuildTargetingBoard()
@@ -81,6 +82,11 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public List<Slider> GetEnemyShipSliders()
+    {
+        return enemyShipSliders;
     }
 
     public List<Cell> GetPlayerBoardGrid()

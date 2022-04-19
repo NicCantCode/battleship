@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class AIManager : MonoBehaviour
 {
     private GameManager _gameManager;
     private BoardManager _boardManager;
     private LogManager _logManager;
-    
-    private Stack<Cell> _playerBoardStack;
-    
-    // New Intermediate Difficulty Variables
-    private bool _foundHitCell;
-    private Vector2 _directionToSearch;
     private Cell _searchOrigin;
-    private int _searchOffset;
+    private Vector2 _directionToSearch;
+    private Stack<Cell> _playerBoardStack;
     private bool _cycledThroughDirections;
+    private bool _foundHitCell;
+    private int _searchOffset;
 
     private void Awake()
     {
@@ -44,11 +39,14 @@ public class AIManager : MonoBehaviour
     IEnumerator EnemyTurnStartCoroutine()
     {
         _gameManager.SetCanPlaceMarkers(false);
+        
+        if (_gameManager.GetGameOverState()) yield break;
+        
         _logManager.LogMessage("Enemy's turn!", Color.yellow);
         
         //yield return new WaitForSecondsRealtime(Random.Range(1,6));
         yield return new WaitForSecondsRealtime(0); // Debug
-        
+
         DoAI(DifficultyManager.Instance.difficulty, out var guessedCell, out var result);
         
         _logManager.LogMessage($"Enemy {result} at {Utils.GridPositionToBattleshipPositionAsString(guessedCell.GetGridLocation())}!", result == MarkerType.HIT ? Color.red : Color.white);

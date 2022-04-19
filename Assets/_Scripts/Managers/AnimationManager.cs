@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimationManager : MonoBehaviour
@@ -11,8 +9,7 @@ public class AnimationManager : MonoBehaviour
     private static readonly int LogWindowEnter = Animator.StringToHash("log_window_enter");
     private static readonly int LogGrow = Animator.StringToHash("log_grow");
     private static readonly int UIEnter = Animator.StringToHash("ui_enter");
-    
-    
+
     [SerializeField] private Animator shipsAnimator;
     [SerializeField] private Animator playerBoardAnimator;
     [SerializeField] private Animator targetingBoardAnimator;
@@ -21,9 +18,10 @@ public class AnimationManager : MonoBehaviour
 
     private void Start()
     {
-        logWindowAnimator.SetTrigger(LogWindowEnter);
         uiAnimator.SetTrigger(UIEnter);
         shipsAnimator.SetTrigger(ShipsEnter);
+
+        StartCoroutine(LogWindowEnterCoroutine());
     }
 
     public void PlayerBoardEnterAnimation()
@@ -38,6 +36,21 @@ public class AnimationManager : MonoBehaviour
 
     public void GrowLogAnimation()
     {
+        StartCoroutine(LogGrowCoroutine());
+    }
+
+    private IEnumerator LogWindowEnterCoroutine()
+    {
+        logWindowAnimator.SetTrigger(LogWindowEnter);
+        yield return new WaitForSeconds(2.5f);
+        logWindowAnimator.enabled = false;
+    }
+    
+    private IEnumerator LogGrowCoroutine()
+    {
+        logWindowAnimator.enabled = true;
         logWindowAnimator.SetTrigger(LogGrow);
+        yield return new WaitForSeconds(2.5f);
+        logWindowAnimator.enabled = false;
     }
 }

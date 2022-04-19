@@ -6,9 +6,18 @@ public class LogManager : MonoBehaviour
     [SerializeField] private GameObject logWindowUIElement;
     [SerializeField] private GameObject logMessagePrefab;
     [SerializeField] private float verticalLogWindowSpacing;
+    
+    private GameManager _gameManager;
+
+    private void Awake()
+    {
+        _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
+    }
 
     public void LogMessage(string message, Color textColor)
     {
+        if (_gameManager.GetGameOverState()) return;
+        
         ExpandViewportForNewMessage();
         var newMessage = Instantiate(logMessagePrefab, logWindowUIElement.transform).GetComponent<TextMeshProUGUI>();
         newMessage.text = message;
