@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Ship : MonoBehaviour
 {
@@ -10,15 +11,14 @@ public class Ship : MonoBehaviour
     private bool _isAboveCells;
     private GameManager _gameManager;
     private LogManager _logManager;
+    private BoardManager _boardManager;
+    [SerializeField] private Slider shipSlider;
 
     private Queue<Cell> _occupiedCells;
     public Queue<Cell> OccupiedCells => _occupiedCells;
 
-    private bool _isSunk;
-    public bool IsSunk => _isSunk;
-
-    [SerializeField] private bool _isPlaced;
-    public bool IsPlaced => _isPlaced;
+    [SerializeField] private bool isPlaced;
+    public bool IsPlaced => isPlaced;
 
     [SerializeField] private int shipSize;
     public int ShipSize => shipSize;
@@ -33,9 +33,9 @@ public class Ship : MonoBehaviour
     {
         _gameManager = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<GameManager>();
         _logManager = GameObject.FindGameObjectWithTag("Log Manager").GetComponent<LogManager>();
+        _boardManager = GameObject.FindGameObjectWithTag("Board Manager").GetComponent<BoardManager>();
         _occupiedCells = new Queue<Cell>(shipSize);
-        _isPlaced = false;
-        _isSunk = false;
+        isPlaced = false;
     }
     
     private void SinkShip()
@@ -45,6 +45,7 @@ public class Ship : MonoBehaviour
             case ShipOwner.ENEMY:
                 _logManager.LogMessage($"Enemy {shipType.ToString()} was sunk!", new Color(155f / 255f, 0, 0));
                 GetGameManagerReference().SubtractFromEnemyShipPool();
+                shipSlider.value = shipSize;
                 break;
             case ShipOwner.PLAYER:
                 _logManager.LogMessage($"Player {shipType.ToString()} was sunk!", new Color(155f / 255f, 0, 0));
@@ -53,19 +54,34 @@ public class Ship : MonoBehaviour
         }
     }
 
+    public void AssignUISlider()
+    {
+        if (shipOwner == ShipOwner.PLAYER) return;
+
+        var enemyShipSliders = _boardManager.GetEnemyShipSliders();
+
+        shipSlider = shipType switch
+        {
+            ShipType.CARRIER => enemyShipSliders[0],
+            ShipType.BATTLESHIP => enemyShipSliders[1],
+            ShipType.CRUISER => enemyShipSliders[2],
+            ShipType.SUBMARINE => enemyShipSliders[3],
+            ShipType.DESTROYER => enemyShipSliders[4],
+            _ => enemyShipSliders[0]
+        };
+
+        shipSlider.minValue = 0;
+        shipSlider.maxValue = shipSize;
+    }
+
     private GameManager GetGameManagerReference()
     {
         return _gameManager;
     }
 
-    public void SetIsSunk(bool isSunk)
+    public void SetIsPlaced(bool newIsPlaced)
     {
-        _isSunk = isSunk;
-    }
-
-    public void SetIsPlaced(bool isPlaced)
-    {
-        _isPlaced = isPlaced;
+        isPlaced = newIsPlaced;
     }
 
     private void SendRaycasts(float thisRotation, Vector3 thisPosition)
@@ -124,8 +140,12 @@ public class Ship : MonoBehaviour
         // If the number of hits equals the total size of the ship, it will sink.
         if (_hitCounter >= shipSize)
         {
-            _isSunk = true;
             SinkShip();
+        }
+
+        if (shipOwner == ShipOwner.PLAYER)
+        {
+            shipSlider.value = _hitCounter;
         }
     }
 

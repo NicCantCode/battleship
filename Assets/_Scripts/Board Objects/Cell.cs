@@ -4,7 +4,9 @@ using UnityEngine;
 public class Cell : MonoBehaviour
 {
     [SerializeField] private Markers markers;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
+    private Vector2 _gridLocation;
     private MarkerType _markerType;
     private GameManager _gameManager;
     private LogManager _logManager;
@@ -15,9 +17,6 @@ public class Cell : MonoBehaviour
     private bool _hasMarker;
     private bool _hasShip;
     private bool _isInPlayerBoard;
-
-    [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Vector2 _gridLocation;
 
     private void Awake()
     {
@@ -54,17 +53,6 @@ public class Cell : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException(nameof(markerType), markerType, "Marker ID Doesn't Exist.");
         }
-    }
-
-    public MarkerType GetMarkerType()
-    {
-        return _markerType;
-    }
-
-    private void RemoveMarker()
-    {
-        Destroy(_cellMarker);
-        _hasMarker = false;
     }
 
     public bool GetHasMarker()
@@ -106,6 +94,7 @@ public class Cell : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (_gameManager.GetGameOverState()) return;
         if (!_gameManager.GetPlaceMarkerState() && _isInPlayerBoard) return;
         
         switch (_hasMarker)
@@ -115,8 +104,11 @@ public class Cell : MonoBehaviour
                 SetMarker(result);
                 
                 _logManager.LogMessage($"Player {result} at {Utils.GridPositionToBattleshipPositionAsString(_gridLocation)}!", result == MarkerType.HIT ? Color.red : Color.white);
-                
-                if (_hasShip) _occupiedShip.MarkShipAsHit();
+
+                if (_hasShip)
+                {
+                    _occupiedShip.MarkShipAsHit();
+                }
                 
                 _aiManager.EnemyTurnStart();
                 return;

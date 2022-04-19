@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class Utils
 {
-    private static Dictionary<int, string> battleshipCharacterDictionary = new Dictionary<int, string> {
+    private static readonly Dictionary<int, string> BattleshipCharacterDictionary = new Dictionary<int, string> {
         {0, "A"},
         {1, "B"},
         {2, "C"},
@@ -39,6 +39,6 @@ public static class Utils
 
     public static string GridPositionToBattleshipPositionAsString(Vector2 gridPosition)
     {
-        return $"{battleshipCharacterDictionary[(int) gridPosition.x]}{10 - gridPosition.y}";
+        return $"{BattleshipCharacterDictionary[(int) gridPosition.x]}{10 - gridPosition.y}";
     }
 }

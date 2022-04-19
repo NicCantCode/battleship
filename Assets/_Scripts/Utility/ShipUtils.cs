@@ -48,6 +48,7 @@ public static class ShipUtils
         ship.SetShipSize(GetShipSizeByType(shipType));
         ship.SetIsPlaced(true);
         ship.SetShipOwner(ShipOwner.ENEMY);
+        ship.AssignUISlider();
 
         foreach (var cell in occupiedCells.ToList())
         {
